@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Você é mais Gato ou Cachorro?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2c5f7a;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .container {
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100vw;
+            padding: 0;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            display: none;
+        }
+
+        .subtitle {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            margin-top: 50px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 20%;
+        }
+
+        .question-container {
+            display: none;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 15px;
+            padding: 40px 25px;
+            position: relative;
+            height: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .question-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .question-container[data-question="1"] {
+            background-image: url('assets/Tela1BG.png');
+        }
+
+        .question-container[data-question="2"] {
+            background-image: url('assets/Tela2BG.png');
+        }
+
+        .question-container[data-question="3"] {
+            background-image: url('assets/Tela3BG.png');
+        }
+
+        .question-container[data-question="4"] {
+            background-image: url('assets/Tela4BG.png');
+        }
+
+        .question-container[data-question="5"] {
+            background-image: url('assets/Tela5BG.png');
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-number {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .question {
+            font-size: 1.4em;
+            color: white;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+            line-height: 1.3;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .option.selected {
+            background: rgba(255, 255, 255, 0.8);
+            color: rgb(0, 0, 0);
+            border-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .option-letter {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2c5f7a;
+            flex-shrink: 0;
+            font-size: 1.1em;
+        }
+
+        .option.selected .option-letter {
+            background: white;
+            color: #2c5f7a;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1em;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .result-container {
+            display: none;
+            padding: 40px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            height: 100vh;
+        }
+
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            z-index: 0;
+        }
+
+        .result-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-container.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-header {
+            text-align: center;
+            width: 100%;
+        }
+
+        .result-logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .result-icon {
+            width: calc(100% + 50px);
+            margin: 0 -25px 0 -25px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        }
+
+        .result-title {
+            font-size: 1.5em;
+            color: white;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .result-description {
+            font-size: 1em;
+            color: white;
+            line-height: 1;
+            margin-bottom: 30px;
+            text-align: left;
+            max-width: 500px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .result-description strong {
+            display: block;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #2c5f7a;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0;
+                height: 100vh;
+            }
+
+            .question-container {
+                padding: 30px 20px;
+                height: 100vh;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .option-text {
+                font-size: 0.95em;
+            }
+
+            .result-title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 Quiz de Personalidade 🐶</h1>
+        <p class="subtitle">Descubra se você é mais gato ou cachorro!</p>
+
+        <!-- Pergunta 1 -->
+        <div class="question-container active" data-question="1">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-number">Pergunta 1 de 5</div>
+            <div class="question">Qual Hobbie combina mais com você?</div>
+            <div class="options">
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">Gosto de praticar esportes, ir na academia e colocar o corpo na ativa</div>
+                </div>
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">Adoro estar com a cultura em dia, ler um livro, ver um filme ou assistir uma série</div>
+                </div>
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">C</div>
+                    <div class="option-text">Adoro sair de casa e conhecer novos lugares!</div>
+                </div>
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">D</div>
+                    <div class="option-text">Gosto de estar antenado nas fotocas! Amo uma rede social ou jogar online</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" disabled id="nextBtn">Próxima Pergunta</button>
+        </div>
+
+        <!-- Pergunta 2 -->
+        <div class="question-container" data-question="2">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-number">Pergunta 2 de 5</div>
+            <div class="question">Você é uma pessoa mais Diurna ou Noturna</div>
+            <div class="options">
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">Diurna</div>
+                </div>
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">Noturna</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" disabled id="nextBtn">Próxima Pergunta</button>
+        </div>
+
+        <!-- Pergunta 3 -->
+        <div class="question-container" data-question="3">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-number">Pergunta 3 de 5</div>
+            <div class="question">Na escola / faculdade você é ou era:</div>
+            <div class="options">
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">Sempre adiantado nas tarefas. Gosto de fazer as coisas com calma e estar sempre em dia!</div>
+                </div>
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">Os 5 minutos finais são os melhores! Funciono na base do desespero</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" disabled id="nextBtn">Próxima Pergunta</button>
+        </div>
+
+        <!-- Pergunta 4 -->
+        <div class="question-container" data-question="4">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-number">Pergunta 4 de 5</div>
+            <div class="question">Qual cenário descreve seu sábado perfeito depois de uma semana agitada?</div>
+            <div class="options">
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">O sábado perfeito envolve sair para passear e socializar com a galera, reunir os amigos para festejar!</div>
+                </div>
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">O sábado perfeito foca em conforto! Passar o dia em casa, fazendo todas as minhas vontades e descansando da semana</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" disabled id="nextBtn">Próxima Pergunta</button>
+        </div>
+
+        <!-- Pergunta 5 -->
+        <div class="question-container" data-question="5">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="question-number">Pergunta 5 de 5</div>
+            <div class="question">Quais áreas você mais se identifica?</div>
+            <div class="options">
+                <div class="option" data-value="gato" onclick="selectOption(this)">
+                    <div class="option-letter">A</div>
+                    <div class="option-text">Humanas: arte, música, história, sociologia e linguagens etc.</div>
+                </div>
+                <div class="option" data-value="cachorro" onclick="selectOption(this)">
+                    <div class="option-letter">B</div>
+                    <div class="option-text">Exatas: Ciências, tecnologia, matemática, física, química etc.</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" disabled id="nextBtn">Ver Resultado</button>
+        </div>
+
+        <!-- Resultado -->
+        <div class="result-container" id="resultContainer">
+            <div class="result-header">
+                <img class="result-icon" id="resultIcon" src="" alt="Resultado">
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-description" id="resultDescription"></div>
+            </div>
+            <button class="restart-btn" onclick="restartQuiz()">Refazer teste</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let answers = [];
+
+        function selectOption(element) {
+            // Remove seleção anterior
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Adiciona seleção atual
+            element.classList.add('selected');
+            
+            // Habilita botão
+            const btn = element.parentElement.nextElementSibling;
+            btn.disabled = false;
+            
+            // Salva resposta
+            const value = element.getAttribute('data-value');
+            answers[currentQuestion - 1] = value;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion === 5) {
+                showResult();
+                return;
+            }
+
+            // Esconde pergunta atual
+            const currentContainer = document.querySelector(`[data-question="${currentQuestion}"]`);
+            currentContainer.classList.remove('active');
+            
+            // Mostra próxima pergunta
+            currentQuestion++;
+            const nextContainer = document.querySelector(`[data-question="${currentQuestion}"]`);
+            nextContainer.classList.add('active');
+            
+            // Atualiza barra de progresso da pergunta atual
+            const progress = (currentQuestion / 5) * 100;
+            const progressBar = nextContainer.querySelector('.progress-fill');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+            
+            // Atualiza botão se já tiver resposta selecionada
+            const btn = nextContainer.querySelector('.btn');
+            if (answers[currentQuestion - 1]) {
+                btn.disabled = false;
+                const selectedOption = nextContainer.querySelector(`[data-value="${answers[currentQuestion - 1]}"]`);
+                if (selectedOption) {
+                    selectedOption.classList.add('selected');
+                }
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        function showResult() {
+            // Conta respostas
+            const gatoCount = answers.filter(a => a === 'gato').length;
+            const cachorroCount = answers.filter(a => a === 'cachorro').length;
+            
+            // Esconde perguntas
+            document.querySelectorAll('.question-container').forEach(q => q.classList.remove('active'));
+            
+            // Mostra resultado
+            const resultContainer = document.getElementById('resultContainer');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDescription = document.getElementById('resultDescription');
+            
+            if (gatoCount > cachorroCount) {
+                resultIcon.src = 'assets/BannerPlan.png';
+                resultIcon.alt = 'Team Plan';
+                resultTitle.textContent = '#EU SOU TEAM PLAN!';
+                resultDescription.innerHTML = `
+                    Parabéns você é uma pessoa que combina muito com a PLAN!
+                    <br><br>
+                    Plan é uma gata que oferece o melhor dos dois mundos: companheirismo intenso equilibrado com uma autonomia respeitável.
+                    <br><br>
+                    Uma verdadeira lady felina!
+                `;
+                resultContainer.style.backgroundImage = "url('assets/Tela1BG.png')";
+            } else if (cachorroCount > gatoCount) {
+                resultIcon.src = 'assets/BannerPro.png';
+                resultIcon.alt = 'Team Pro';
+                resultTitle.textContent = '#EU SOU TEAM PRO!';
+                resultDescription.innerHTML = `
+                    Parabéns você é uma pessoa que combina muito com o PRO!
+                    <br><br>
+                    Pro é um cão muito entusiasmado, extrovertido e leal, cuja principal missão é garantir que todos estejam se divertindo juntos!
+                    <br><br>
+                    Ele é o típico cão que te recebe com uma festa sempre que você chega.
+                `;
+                resultContainer.style.backgroundImage = "url('assets/Tela1BG.png')";
+            } else {
+                resultIcon.src = 'assets/BannerPlan.png';
+                resultIcon.alt = 'Equilíbrio Perfeito';
+                resultTitle.textContent = 'Você é um equilíbrio perfeito!';
+                resultDescription.innerHTML = `
+                    Que interessante! Você tem características tanto de gato quanto de cachorro. 
+                    Você sabe quando ser independente e quando ser sociável, equilibrando perfeitamente 
+                    momentos de energia com momentos de calma.
+                `;
+                resultContainer.style.backgroundImage = "url('assets/Tela1BG.png')";
+            }
+            
+            resultContainer.classList.add('active');
+        }
+
+        function restartQuiz() {
+            currentQuestion = 1;
+            answers = [];
+            
+            // Reseta interface
+            document.getElementById('resultContainer').classList.remove('active');
+            document.querySelector('[data-question="1"]').classList.add('active');
+            
+            // Reseta todas as barras de progresso
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                bar.style.width = '20%';
+            });
+            
+            // Remove todas as seleções
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Desabilita todos os botões
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (!btn.classList.contains('restart-btn')) {
+                    btn.disabled = true;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
